@@ -1,5 +1,33 @@
 package ru.practicum.moviehub.http;
 
-public class MoviesServer {
+import com.sun.net.httpserver.HttpServer;
+import ru.practicum.moviehub.store.MoviesStore;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+
+public class MoviesServer {
+    private final HttpServer server;
+    private final MoviesStore store;
+
+    public MoviesServer(MoviesStore store, int port) {
+        this.store = store;
+        try {
+            this.server = HttpServer.create(new InetSocketAddress(port), 0);
+            server.createContext("/movies", new MoviesHandler(store));
+            server.setExecutor(null);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to start server", e);
+        }
+    }
+
+    public void start() {
+        server.start();
+        System.out.println("Server started on port " + server.getAddress().getPort());
+    }
+
+    public void stop() {
+        server.stop(0);
+        System.out.println("Server stopped");
+    }
 }

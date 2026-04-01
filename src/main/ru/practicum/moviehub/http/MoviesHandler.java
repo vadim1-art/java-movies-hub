@@ -23,11 +23,9 @@ public class MoviesHandler extends BaseHttpHandler {
 
         if ("GET".equals(method) && path.equals("/movies")) {
             handleGetAll(exchange);
-        }
-        else if ("POST".equals(method) && path.equals("/movies")) {
+        } else if ("POST".equals(method) && path.equals("/movies")) {
             handlePost(exchange);
-        }
-        else {
+        } else {
             sendNotFound(exchange, "Endpoint not found");
         }
     }

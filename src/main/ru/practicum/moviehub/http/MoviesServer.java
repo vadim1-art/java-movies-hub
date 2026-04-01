@@ -15,6 +15,14 @@ public class MoviesServer {
         try {
             this.server = HttpServer.create(new InetSocketAddress(port), 0);
             server.createContext("/movies", new MoviesHandler(store));
+            server.createContext("/", exchange -> {
+                String response = "Endpoint not found";
+                exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
+                exchange.sendResponseHeaders(404, response.getBytes().length);
+                try (var os = exchange.getResponseBody()) {
+                    os.write(response.getBytes());
+                }
+            });
             server.setExecutor(null);
         } catch (IOException e) {
             throw new RuntimeException("Failed to start server", e);

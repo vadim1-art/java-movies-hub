@@ -1,6 +1,7 @@
 package ru.practicum.moviehub.http;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.*;
 import ru.practicum.moviehub.model.Movie;
 import ru.practicum.moviehub.store.MoviesStore;
@@ -51,8 +52,8 @@ public class MoviesApiTest {
         assertEquals(200, response.statusCode());
         assertEquals("application/json; charset=UTF-8", response.headers().firstValue("Content-Type").orElse(""));
 
-        List<Movie> movies = gson.fromJson(response.body(), new ListOfMoviesTypeToken(){}.getType());
-        assertTrue(movies.isEmpty(), "Список фильмов должен быть пустым");
+        List<Movie> movies = gson.fromJson(response.body(), new TypeToken<List<Movie>>(){}.getType());
+        assertTrue(movies.isEmpty());
     }
 
     @Test
@@ -71,7 +72,7 @@ public class MoviesApiTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, response.statusCode());
-        List<Movie> movies = gson.fromJson(response.body(), new ListOfMoviesTypeToken(){}.getType());
+        List<Movie> movies = gson.fromJson(response.body(), new TypeToken<List<Movie>>(){}.getType());
         assertEquals(2, movies.size());
 
         Movie first = movies.get(0);
@@ -102,7 +103,7 @@ public class MoviesApiTest {
         assertEquals("application/json; charset=UTF-8", response.headers().firstValue("Content-Type").orElse(""));
 
         String location = response.headers().firstValue("Location").orElse("");
-        assertTrue(location.matches("/movies/\\d+"), "Location должен содержать id созданного фильма");
+        assertTrue(location.matches("/movies/\\d+"));
 
         Movie created = gson.fromJson(response.body(), Movie.class);
         assertNotEquals(0, created.getId());
@@ -130,7 +131,7 @@ public class MoviesApiTest {
 
     @Test
     void postMovie_withInvalidJson_returns400() throws Exception {
-        String invalidJson = "{ \"title\": \"Inception\", \"director\": \"Christopher Nolan\", year: 2010 }";
+        String invalidJson = "{ title: \"Inception\", \"director\": \"Christopher Nolan\", \"year\": 2010 }";
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/movies"))

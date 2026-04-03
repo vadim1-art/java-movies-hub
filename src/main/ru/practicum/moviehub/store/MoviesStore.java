@@ -29,6 +29,13 @@ public class MoviesStore {
         return movies.remove(id) != null;
     }
 
+    public void updateMovie(Movie movie) {
+        if (!movies.containsKey(movie.getId())) {
+            throw new IllegalArgumentException("Movie with id " + movie.getId() + " not found");
+        }
+        movies.put(movie.getId(), movie);
+    }
+
     public void clear() {
         movies.clear();
         idGenerator.set(1);

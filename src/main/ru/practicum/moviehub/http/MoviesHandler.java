@@ -21,17 +21,18 @@ public class MoviesHandler extends BaseHttpHandler {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
 
-        if ("GET".equals(method) && path.equals("/movies")) {
-            handleGetAll(exchange);
-        } else if ("POST".equals(method) && path.equals("/movies")) {
+        if (!path.equals("/movies")) {
+            sendNotFound(exchange, "Not found");
+            return;
+        }
+
+        if ("GET".equals(method)) {
+            sendJson(exchange, store.getAllMovies(), 200);
+        } else if ("POST".equals(method)) {
             handlePost(exchange);
         } else {
-            sendNotFound(exchange, "Endpoint not found");
+            sendNotFound(exchange, "Method not allowed");
         }
-    }
-
-    private void handleGetAll(HttpExchange exchange) throws IOException {
-        sendJson(exchange, store.getAllMovies(), 200);
     }
 
     private void handlePost(HttpExchange exchange) throws IOException {
@@ -49,8 +50,6 @@ public class MoviesHandler extends BaseHttpHandler {
             sendJson(exchange, created, 201);
         } catch (JsonSyntaxException e) {
             sendBadRequest(exchange, "Invalid JSON format");
-        } catch (Exception e) {
-            sendInternalError(exchange, "Internal server error");
         }
     }
 }

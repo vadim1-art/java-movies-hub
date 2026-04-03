@@ -15,27 +15,20 @@ public class MoviesServer {
         try {
             this.server = HttpServer.create(new InetSocketAddress(port), 0);
             server.createContext("/movies", new MoviesHandler(store));
-            server.createContext("/", exchange -> {
-                String response = "Endpoint not found";
-                exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=UTF-8");
-                exchange.sendResponseHeaders(404, response.getBytes().length);
-                try (var os = exchange.getResponseBody()) {
-                    os.write(response.getBytes());
-                }
-            });
+            server.createContext("/movies/", new MovieHandler(store));
             server.setExecutor(null);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to start server", e);
+            throw new RuntimeException("Failed to start server on port " + port, e);
         }
     }
 
     public void start() {
         server.start();
-        System.out.println("Server started on port " + server.getAddress().getPort());
+        System.out.println("Movies server started on port " + server.getAddress().getPort());
     }
 
     public void stop() {
         server.stop(0);
-        System.out.println("Server stopped");
+        System.out.println("Movies server stopped");
     }
 }
